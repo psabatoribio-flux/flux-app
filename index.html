@@ -28450,8 +28450,33 @@ function Transactions({ txns, deleteTxn, updateTxn, undoTxns, undoStack, showToa
   const [sortDesc, setSortDesc] = useState(true);
   const set = (k, v) => setFilter(f => ({ ...f, [k]: v }));
 
+  const [reassign, setReassign] = useState(null); // {txn, newCode, newName, matches}
+
   const startEdit = (t) => { setEditingId(t.id); setEditCode(t.code); };
-  const saveEdit = (id) => { updateTxn(id, { code: editCode }); setEditingId(null); showToast("✓ Moviment actualitzat"); };
+  const saveEdit = (txn) => {
+    if (editCode === txn.code) { setEditingId(null); return; }
+    const { catMap: cm } = { catMap };
+    const newName = catMap[editCode]?.name || editCode;
+    const descKey = (txn.description || "").toLowerCase().trim();
+    const matches = descKey
+      ? txns.filter(t => t.id !== txn.id && (t.description || "").toLowerCase().trim() === descKey && t.code !== editCode)
+      : [];
+    setEditingId(null);
+    if (matches.length > 0) {
+      setReassign({ txn: { ...txn, code: txn.code }, newCode: editCode, newName, matches });
+    } else {
+      updateTxn(txn.id, { code: editCode });
+      showToast(`✓ Reassignat a ${newName}`);
+    }
+  };
+  const handleReassignConfirm = (ids) => {
+    ids.forEach(id => {
+      const t = txns.find(x => x.id === id);
+      if (t) updateTxn(id, { code: reassign.newCode });
+    });
+    showToast(`✓ ${ids.length} moviment${ids.length !== 1 ? "s" : ""} reassignats a ${reassign.newName}`);
+    setReassign(null);
+  };
   const cancelEdit = () => setEditingId(null);
 
   const runDupScan = () => {
@@ -28684,7 +28709,7 @@ function Transactions({ txns, deleteTxn, updateTxn, undoTxns, undoStack, showToa
                   {isEditing ? (
                     <>
                       <button style={{ padding: "4px 8px", background: "#10B981", color: "#FFF", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
-                        onClick={() => saveEdit(t.id)}>✓</button>
+                        onClick={() => saveEdit(t)}>✓</button>
                       <button style={{ padding: "4px 8px", background: "#EF4444", color: "#FFF", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
                         onClick={cancelEdit}>✕</button>
                     </>
@@ -28702,6 +28727,22 @@ function Transactions({ txns, deleteTxn, updateTxn, undoTxns, undoStack, showToa
           })}
         </div>
       </div>
+
+      {/* Modal reassignació en bloc (desktop) */}
+      {reassign && (
+        <ReassignModal
+          txn={reassign.txn}
+          newCode={reassign.newCode}
+          newName={reassign.newName}
+          matches={reassign.matches}
+          onConfirm={handleReassignConfirm}
+          onCancel={() => {
+            updateTxn(reassign.txn.id, { code: reassign.newCode });
+            showToast(`✓ Reassignat a ${reassign.newName}`);
+            setReassign(null);
+          }}
+        />
+      )}
 
       {/* Duplicates panel */}
       {showDupPanel && (
