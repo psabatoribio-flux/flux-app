@@ -928,7 +928,7 @@ async function loadFromFirestore(llarId,field){if(!window.db||!llarId)return und
 async function loadAll(llarId){// Estableix el scope de cache per aquesta llar (evita barreja entre llars)
 setLsScope(llarId);var fields=["budget","rules","pending","customCats","histSeeded"];var result={};// 1. Cache local (instantani, funciona offline)
 for(var k of fields){var v=lsGet(k);if(v!==undefined)result[k]=v;}result.txns=loadTxnsLS();// 2. Si cache buit O txns buides (dispositiu nou / localStorage buit) → carrega Firestore
-var cacheEmpty=result.txns.length===0;if(cacheEmpty&&llarId){console.log("Cache buit o txns buides — carregant des de Firestore…");for(var k of fields){var v=await loadFromFirestore(llarId,k);if(v!==undefined){result[k]=v;lsSet(k,v);}}var fsxns=await loadFromFirestore(llarId,"txns");if(fsxns&&fsxns.length>0){result.txns=fsxns;saveTxnsLS(fsxns);console.log(`Carregades ${fsxns.length} txns de Firestore`);}}return result;}async function saveField(field,val,llarId){llarId=llarId||window._currentLlarId;if(llarId)setLsScope(llarId);// assegura scope correcte en escriptures
+var cacheEmpty=result.txns.length===0;if(cacheEmpty&&llarId){console.log("Cache buit o txns buides — carregant des de Firestore…");for(var k of fields){var v=await loadFromFirestore(llarId,k);if(v!==undefined){result[k]=v;lsSet(k,v);}}var fsxns=await loadFromFirestore(llarId,"txns");if(fsxns&&fsxns.length>0){result.txns=fsxns;saveTxnsLS(fsxns);console.log(`Carregades ${fsxns.length} txns de Firestore`);}}return result;}async function saveField(field,val,llarId){llarId=llarId||window._currentLlarId;window._lastSaveField={field,llarId,time:new Date().toISOString()};if(llarId)setLsScope(llarId);// assegura scope correcte en escriptures
 if(field==="txns"){saveTxnsLS(val);}else{lsSet(field,val);}if(llarId)saveToFirestore(llarId,field,val);}// ── Gestió de llars ───────────────────────────────────────────────────────
 // Genera un ID únic per a la llar
 function genLlarId(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);}// Crea una llar nova i associa l'usuari
@@ -1377,4 +1377,21 @@ function SectionTitle({children}){return/*#__PURE__*/React.createElement("h2",{s
 
 </script>
 
+
+<script>
+// Debug panel - accessible via window.showDebug()
+window.showDebug = function() {
+  var info = {
+    llarId: window._currentLlarId,
+    modeLocal: window._modeLocal,
+    lastSave: window._lastSaveField,
+    lsLlarId: localStorage.getItem('_flux_llarId'),
+    txnsLS: (function(){try{var k=Object.keys(localStorage).filter(k=>k.includes('txn'));return k.length+' keys';}catch(e){return 'err';}})()
+  };
+  var msg = JSON.stringify(info, null, 2);
+  alert(msg);
+};
+// Auto-show if URL has #debug
+if(window.location.hash === '#debug') window.addEventListener('load', function(){setTimeout(window.showDebug, 2000);});
+</script>
 </body></html>
