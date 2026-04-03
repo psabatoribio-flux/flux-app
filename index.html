@@ -1033,13 +1033,163 @@ var GROUP_ICON_MAP={"1":"budget",// Llar → $
 "7":"txns",// Consum → llista
 "8":"alertes",// Deutes → campana
 "9":"entry"// Ingressos → +
-};function BudgetMobile({txns=[],budget={},onBudgetChange,onHome,onMenu,cats=[]}){const[activeGroup,setActiveGroup]=useState(null);const[bmMode,setBmMode]=useState("mes");const[bmMonths,setBmMonths]=useState(3);const[bmSelY,setBmSelY]=useState(()=>new Date().getFullYear());const[bmSelM,setBmSelM]=useState(()=>new Date().getMonth()+1);const[bmFromM,setBmFromM]=useState(1);const[bmFromY,setBmFromY]=useState(()=>new Date().getFullYear());const[bmToM,setBmToM]=useState(()=>new Date().getMonth()+1);const[bmToY,setBmToY]=useState(()=>new Date().getFullYear());// null = vista resum
-var activeBudgetGroups=cats&&cats.length>0?cats.filter(c=>c.level==="grup"&&c.type==="DESPESA").map(g=>({code:g.code,name:g.name,color:{"1":"#10B981","2":"#60a5fa","3":"#6366f1","4":"#0891b2","5":"#ef4444","6":"#f59e0b","7":"#8b5cf6","8":"#fbbf24","9":"#10B981"}[g.code]||"#7A7A9A",subs:cats.filter(s=>s.group===g.code&&s.level==="sub").map(s=>({code:s.code,name:s.name}))})):BUDGET_GROUPS;const[editCode,setEditCode]=useState(null);const[editVal,setEditVal]=useState("");var now=new Date();var curY=now.getFullYear(),curM=now.getMonth()+1;// Despeses reals del mes actual per categoria
-var bmMult=useMemo(()=>{if(bmMode==="mes")return 1;if(bmMode==="rang"){var fd=new Date(bmFromY,bmFromM-1,1);var td=new Date(bmToY,bmToM-1,1);return Math.max(1,Math.round((td-fd)/30/24/3600/1000));}var ms=new Set(txns.map(t=>t.date.slice(0,7)));return Math.max(1,ms.size);},[bmMode,bmMonths,txns]);var realByCat=useMemo(()=>{var r={};var sl=bmMode==="mes"?txns.filter(t=>{var d=new Date(t.date);return d.getFullYear()===bmSelY&&d.getMonth()+1===bmSelM;}):bmMode==="rang"?txns.filter(t=>{var df=`${bmFromY}-${String(bmFromM).padStart(2,"0")}-01`;var ld=new Date(bmToY,bmToM,0).getDate();var dt=`${bmToY}-${String(bmToM).padStart(2,"0")}-${String(ld).padStart(2,"0")}`;return t.date>=df&&t.date<=dt;}):txns;sl.forEach(t=>{r[t.code]=(r[t.code]||0)+t.amount;});return r;},[txns,curY,curM,bmMode,bmMonths]);var saveEdit=code=>{var v=parseFloat(editVal.replace(",","."));if(!isNaN(v)&&v>=0)onBudgetChange({...budget,[code]:v});setEditCode(null);setEditVal("");};// ── Vista resum per grups ──
-var groups=activeBudgetGroups.map(g=>{var budgTotal=g.subs.reduce((s,c)=>s+(budget[c.code]||0)*bmMult,0);var realTotal=g.subs.reduce((s,c)=>s+(realByCat[c.code]||0),0);var pct=budgTotal>0?Math.round(realTotal/budgTotal*100):null;var barColor=pct===null?"var(--subtle)":pct>100?"#f87171":pct>80?"#fbbf24":"#10B981";return{...g,budgTotal,realTotal,pct,barColor};});var totalBudg=groups.reduce((s,g)=>s+g.budgTotal,0);var totalBudgDep=groups.filter(g=>activeBudgetGroups.find(ag=>ag.code===g.code)?.type!=="INGRÉS").reduce((s,g)=>s+g.budgTotal,0);var totalBudgIng=groups.filter(g=>activeBudgetGroups.find(ag=>ag.code===g.code)?.type==="INGRÉS").reduce((s,g)=>s+g.budgTotal,0);var totalReal=groups.filter(g=>activeBudgetGroups.find(ag=>ag.code===g.code)?.type!=="INGRÉS").reduce((s,g)=>s+g.realTotal,0);
-var totalPct=totalBudg>0?Math.round(totalReal/totalBudg*100):0;// ── Vista detall d'un grup ──
-if(activeGroup!==null){var g=activeBudgetGroups.find(x=>x.code===activeGroup)||activeBudgetGroups[0];var pal=TAB_PAL.budget;return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement("button",{onClick:()=>setActiveGroup(null),style:{width:32,height:32,borderRadius:10,background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.6)",fontSize:16,flexShrink:0}},"\u2190"),/*#__PURE__*/React.createElement("div",{style:{flex:1}},/*#__PURE__*/React.createElement("div",{style:{fontSize:17,fontWeight:800,color:"var(--text)"}},g.name),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},"Edita els l\xEDmits mensuals"))),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},g.subs.map(sub=>{var bud=budget[sub.code]||0;var real=realByCat[sub.code]||0;var pct=bud>0?Math.round(real/bud*100):null;var bc=pct===null?"var(--subtle)":pct>100?"#f87171":pct>80?"#fbbf24":"#10B981";var isEd=editCode===sub.code;return/*#__PURE__*/React.createElement("div",{key:sub.code,style:{background:"rgba(0,0,0,.03)",border:"1px solid rgba(0,0,0,.06)",borderRadius:14,padding:"14px 16px",marginBottom:10}},/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}},/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"var(--text2)"}},sub.name),isEd?/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center"}},/*#__PURE__*/React.createElement("input",{type:"number",value:editVal,onChange:e=>setEditVal(e.target.value),onKeyDown:e=>{if(e.key==="Enter")saveEdit(sub.code);if(e.key==="Escape")setEditCode(null);},autoFocus:true,style:{width:80,background:"rgba(0,0,0,.07)",border:"1.5px solid rgba(52,211,153,.4)",borderRadius:8,padding:"5px 8px",fontSize:13,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",textAlign:"right"}}),/*#__PURE__*/React.createElement("span",{style:{fontSize:11,color:"var(--muted)"}},"\u20AC"),/*#__PURE__*/React.createElement("button",{onClick:()=>saveEdit(sub.code),style:{background:"#10B981",border:"none",borderRadius:7,padding:"5px 10px",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}},"\u2713")):/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},/*#__PURE__*/React.createElement("span",{style:{fontSize:14,fontWeight:800,fontFamily:"var(--font-mono)",color:bc}},bud>0?bud+"€":"—"),/*#__PURE__*/React.createElement("button",{onClick:()=>{setEditCode(sub.code);setEditVal(bud>0?String(bud):"");},style:{background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",borderRadius:7,padding:"4px 9px",color:"var(--subtle)",fontSize:11,cursor:"pointer"}},"\u270E"))),/*#__PURE__*/React.createElement("div",{style:{height:5,background:"rgba(0,0,0,.06)",borderRadius:4,overflow:"hidden",marginBottom:6}},/*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(pct||0,100)}%`,background:bc,borderRadius:4,transition:"width .4s"}})),/*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--subtle)",fontFamily:"var(--font-mono)"}},/*#__PURE__*/React.createElement("span",null,"Real: ",real>0?Math.round(real)+"€":"0€"),pct!==null&&/*#__PURE__*/React.createElement("span",{style:{color:bc}},pct,"%")));})),/*#__PURE__*/React.createElement("div",{style:{textAlign:"center",padding:"12px 0 4px",fontSize:9,color:"var(--subtle)",fontFamily:"var(--font-mono)"}},"Toca \u270E per editar el l\xEDmit mensual"),/*#__PURE__*/React.createElement(MobileBar,{screen:"budget",onHome:onHome,onMenu:onMenu}));}// ── Vista resum ──
-return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement(TabBadge,{id:"budget",size:36,active:true}),/*#__PURE__*/React.createElement("div",null,/*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Pressupost"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},bmMode==="mes"?MONTHS_SHORT[bmSelM-1]+" "+bmSelY:bmMode==="rang"?MONTHS_SHORT[bmFromM-1]+" "+bmFromY+" – "+MONTHS_SHORT[bmToM-1]+" "+bmToY:"Des de l'origen"))),/*#__PURE__*/React.createElement("div",{className:"card-gradient",style:{margin:"0 18px 14px",background:"linear-gradient(135deg,#ECEAE6,#E4E0D9)",borderRadius:16,padding:"16px 18px",position:"relative",overflow:"hidden",boxShadow:"0 6px 24px rgba(0,0,0,.15)"}},/*#__PURE__*/React.createElement("div",{style:{position:"absolute",right:-16,top:-16,width:80,height:80,borderRadius:"50%",background:"rgba(52,211,153,.06)",pointerEvents:"none"}}),/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:20,position:"relative",marginBottom:12}},/*#__PURE__*/React.createElement("div",null,/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:4}},"Estalvi previst"),/*#__PURE__*/React.createElement("div",{style:{fontSize:20,fontWeight:800,fontFamily:"var(--font-mono)",color:"#10B981",lineHeight:1}},totalBudgIng>0?Math.round(totalBudgIng-totalBudgDep)+"€":totalBudgDep>0?"-"+Math.round(totalBudgDep)+"€":"—")),/*#__PURE__*/React.createElement("div",null,/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:4}},bmMode==="mes"?"Despeses reals":bmMode==="rang"?"Acumulat "+bmMonths+"m":"Acumulat total"),/*#__PURE__*/React.createElement("div",{style:{fontSize:20,fontWeight:800,fontFamily:"var(--font-mono)",color:totalPct>100?"#f87171":totalPct>80?"#fbbf24":"var(--text)",lineHeight:1}},Math.round(totalReal),"\u20AC")),/*#__PURE__*/React.createElement("div",{style:{marginLeft:"auto"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:4}},"Diferència"),/*#__PURE__*/React.createElement("div",{style:{fontSize:20,fontWeight:800,fontFamily:"var(--font-mono)",color:"#10B981",lineHeight:1}},Math.max(0,totalBudg-totalReal).toFixed(2),"\u20AC"))),/*#__PURE__*/React.createElement("div",{style:{height:6,background:"rgba(0,0,0,.07)",borderRadius:4,overflow:"hidden",marginBottom:6}},/*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(totalPct,100)}%`,background:totalPct>100?"#f87171":totalPct>80?"linear-gradient(90deg,#fbbf24,#f59e0b)":"linear-gradient(90deg,#10B981,#10B981)",borderRadius:4,transition:"width .6s"}})),/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--muted)",fontFamily:"var(--font-mono)"}},totalPct,"% del pressupost mensual")),/*#__PURE__*/React.createElement("div",{style:{margin:"0 18px 14px",background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",gap:8}},/*#__PURE__*/React.createElement("span",{style:{fontSize:14}},"\uD83D\uDCBB"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--text2)",lineHeight:1.5}},"L'edici\xF3 de pressupostos \xE9s disponible a la ",/*#__PURE__*/React.createElement("strong",null,"versi\xF3 web"),". Aqu\xED pots consultar el teu estat actual.")),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,marginBottom:10}},["mes","rang","origen"].map((m,i)=>/*#__PURE__*/React.createElement("button",{key:m,onClick:()=>setBmMode(m),style:{flex:1,padding:"7px 0",borderRadius:10,border:"1px solid",fontSize:11,fontWeight:700,cursor:"pointer",transition:"all .2s",borderColor:bmMode===m?"rgba(245,158,11,.7)":"rgba(0,0,0,.08)",background:bmMode===m?"rgba(245,158,11,.15)":"transparent",color:bmMode===m?"#f59e0b":"var(--muted)",boxShadow:bmMode===m?"0 0 12px rgba(245,158,11,.3)":"none"}},["Mes","Rang","Des d'origen"][i]))),bmMode==="mes"&&/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8}},/*#__PURE__*/React.createElement("select",{value:bmSelM,onChange:e=>setBmSelM(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),/*#__PURE__*/React.createElement("select",{value:bmSelY,onChange:e=>setBmSelY(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},[...new Set(txns.map(t=>new Date(t.date).getFullYear()))].sort().map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y)))),bmMode==="rang"&&/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8,alignItems:"center"}},/*#__PURE__*/React.createElement("select",{value:bmFromM,onChange:e=>setBmFromM(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),/*#__PURE__*/React.createElement("select",{value:bmFromY,onChange:e=>setBmFromY(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},[...new Set(txns.map(t=>new Date(t.date).getFullYear()))].sort().map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y))),/*#__PURE__*/React.createElement("span",{style:{fontSize:11,color:"var(--muted)"}},"→"),/*#__PURE__*/React.createElement("select",{value:bmToM,onChange:e=>setBmToM(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),/*#__PURE__*/React.createElement("select",{value:bmToY,onChange:e=>setBmToY(parseInt(e.target.value)),style:{padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"}},[...new Set(txns.map(t=>new Date(t.date).getFullYear()))].sort().map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y)))),/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--text2)",fontWeight:700,letterSpacing:".07em",textTransform:"uppercase",marginBottom:10}},"Per grups \u2014 toca per veure detall"),groups.map((g,i)=>/*#__PURE__*/React.createElement("div",{key:g.code,className:"fade-up card-surface",style:{animationDelay:`${i*.06}s`,background:"rgba(255,255,255,.8)",border:"1px solid rgba(0,0,0,.07)",borderRadius:14,padding:"14px 16px",marginBottom:10,cursor:"pointer",transition:"background .15s",boxShadow:"0 2px 6px rgba(0,0,0,.04)"},onClick:()=>setActiveGroup(g.code)},/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement("span",{style:{fontSize:11,fontWeight:800,fontFamily:"var(--font-mono)",color:"var(--subtle)",width:14,flexShrink:0}},g.code),/*#__PURE__*/React.createElement("div",{style:{width:28,height:28,borderRadius:9,background:g.color+"18",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},/*#__PURE__*/React.createElement("div",{style:{width:14,height:14,color:g.color,display:"flex",alignItems:"center",justifyContent:"center"}},TAB_SVG[GROUP_ICON_MAP[g.code]]||TAB_SVG.budget)),/*#__PURE__*/React.createElement("span",{style:{fontSize:13,fontWeight:600,color:"var(--text)"}},g.name)),/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},g.pct!==null&&/*#__PURE__*/React.createElement("span",{style:{fontSize:11,fontWeight:700,fontFamily:"var(--font-mono)",color:g.barColor}},g.pct,"%"),/*#__PURE__*/React.createElement("span",{style:{fontSize:10,fontFamily:"var(--font-mono)",color:"var(--muted)"}},g.budgTotal>0?`${Math.round(g.realTotal)}/${g.budgTotal}€`:"sense límit"),/*#__PURE__*/React.createElement("span",{style:{fontSize:12,color:"var(--subtle)"}},"\u203A"))),g.pct!==null&&/*#__PURE__*/React.createElement("div",{style:{height:4,background:"rgba(0,0,0,.06)",borderRadius:3,overflow:"hidden"}},/*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(g.pct,100)}%`,background:g.barColor,borderRadius:3,transition:"width .5s"}}))))),/*#__PURE__*/React.createElement(MobileBar,{screen:"budget",onHome:onHome,onMenu:onMenu}));}// ════════════════════════════════════════════════════════════════════════════
+};function BudgetMobile({txns=[],budget={},onBudgetChange,onHome,onMenu,cats=[]}){
+  var now=new Date();var curY=now.getFullYear(),curM=now.getMonth()+1;
+  // ── Mode ──
+  const[viewMode,setViewMode]=useState("mes");
+  const[selYear,setSelYear]=useState(curY);
+  const[selMonth,setSelMonth]=useState(curM);
+  const[avgFrom,setAvgFrom]=useState(curY-1);const[avgFromM,setAvgFromM]=useState(1);
+  const[avgTo,setAvgTo]=useState(curY);const[avgToM,setAvgToM]=useState(curM);
+  // ── Edit ──
+  const[activeGroup,setActiveGroup]=useState(null);
+  const[editCode,setEditCode]=useState(null);const[editVal,setEditVal]=useState("");
+  // ── Grups col·lapsables ──
+  const[expandedGroups,setExpandedGroups]=useState({});
+  var toggleGroup=gc=>setExpandedGroups(prev=>({...prev,[gc]:!prev[gc]}));
+  // ── catMap local ──
+  var catMap=useMemo(()=>Object.fromEntries((cats&&cats.length>0?cats:DEFAULT_CATS_MOBILE).map(c=>[c.code,c])),[cats]);
+  var allCats=cats&&cats.length>0?cats:DEFAULT_CATS_MOBILE;
+  var allYears=useMemo(()=>[...new Set(txns.map(t=>new Date(t.date).getFullYear()))].sort(),[txns]);
+  // ── Dades reals: mes seleccionat ──
+  var thisMonthActual=useMemo(()=>{var map={};txns.filter(t=>{var d=new Date(t.date);return d.getFullYear()===selYear&&d.getMonth()+1===selMonth;}).forEach(t=>{map[t.code]=(map[t.code]||0)+t.amount;});return map;},[txns,selYear,selMonth]);
+  // ── Dades reals: mitjana del rang ──
+  var avgActual=useMemo(()=>{var periodTxns,numMonths;if(viewMode==="origen"){periodTxns=txns;var minY=allYears[0]||curY;var maxY=allYears[allYears.length-1]||curY;numMonths=Math.max((maxY-minY+1)*12,1);}else{var fromStr=`${avgFrom}-${String(avgFromM).padStart(2,"0")}-01`;var toY2=avgTo;var toM2=avgToM;var ld=new Date(toY2,toM2,0).getDate();var toStr=`${toY2}-${String(toM2).padStart(2,"0")}-${String(ld).padStart(2,"0")}`;periodTxns=txns.filter(t=>t.date>=fromStr&&t.date<=toStr);var fd2=new Date(fromStr),td2=new Date(toStr);numMonths=Math.max(Math.round((td2-fd2)/30/24/3600/1000),1);}var map={};periodTxns.forEach(t=>{map[t.code]=(map[t.code]||0)+t.amount;});Object.keys(map).forEach(k=>{map[k]=map[k]/numMonths;});return map;},[txns,viewMode,avgFrom,avgFromM,avgTo,avgToM,allYears,curY]);
+  var displayActual=viewMode==="mes"?thisMonthActual:avgActual;
+  // ── Totals ──
+  var totals=useMemo(()=>{var bI=0,bD=0,rI=0,rD=0;allCats.filter(c=>c.level==="sub").forEach(c=>{var g=catMap[c.group];var bud=budget[c.code]||0;var act=displayActual[c.code]||0;if(g?.type==="INGRÉS"){bI+=bud;rI+=act;}else{bD+=bud;rD+=act;}});return{bI,bD,rI,rD,resultat:(rI-rD)-(bI-bD)};},[allCats,catMap,budget,displayActual]);
+  var totalPct=totals.bD>0?Math.round(totals.rD/totals.bD*100):0;
+  // ── Grups ──
+  var groups=useMemo(()=>[...new Set(allCats.filter(c=>c.level==="grup").map(c=>c.code))].map(gc=>{var groupCat=catMap[gc];var subs=allCats.filter(c=>c.group===gc&&c.level==="sub");var gBud=subs.reduce((s,c)=>s+(budget[c.code]||0),0);var gAct=subs.reduce((s,c)=>s+(displayActual[c.code]||0),0);var pct=gBud>0?Math.round(gAct/gBud*100):null;var isExp=expandedGroups[gc]!==false;var color={"1":"#10B981","2":"#60a5fa","3":"#6366f1","4":"#0891b2","5":"#ef4444","6":"#f59e0b","7":"#8b5cf6","8":"#fbbf24","9":"#10B981"}[gc]||"#7A7A9A";var barColor=pct===null?"var(--subtle)":pct>100?"#f87171":pct>80?"#fbbf24":"#10B981";return{code:gc,name:groupCat?.name||gc,type:groupCat?.type||"DESPESA",budget:gBud,actual:gAct,pct,isExpanded:isExp,barColor,subs:subs.map(cat=>{var bud=budget[cat.code]||0;var act=displayActual[cat.code]||0;var p=bud>0?Math.round(act/bud*100):null;var bc=p===null?"var(--subtle)":p>100?"#f87171":p>80?"#fbbf24":"#10B981";return{code:cat.code,name:cat.name,budget:bud,actual:act,pct:p,barColor:bc};})};}),[allCats,catMap,budget,displayActual,expandedGroups]);
+  var saveEdit=code=>{var v=parseFloat(editVal.replace(",","."));if(!isNaN(v)&&v>=0)onBudgetChange({...budget,[code]:v});setEditCode(null);setEditVal("");};
+  // ── Label ──
+  var viewLabel=viewMode==="mes"?MONTHS_CA[selMonth-1]+" "+selYear:viewMode==="rang"?"Mitj. "+MONTHS_SHORT[avgFromM-1]+" "+avgFrom+" – "+MONTHS_SHORT[avgToM-1]+" "+avgTo:"Mitj. total";
+  var ss={padding:"5px 8px",borderRadius:8,border:"1px solid rgba(245,158,11,.3)",fontSize:11,background:"rgba(245,158,11,.08)",color:"#f59e0b",cursor:"pointer",outline:"none"};
+  // ── Vista detall grup ──
+  if(activeGroup!==null){
+    var g=groups.find(x=>x.code===activeGroup)||groups[0];
+    if(!g)return null;
+    return/*#__PURE__*/React.createElement("div",{className:"m-screen"},
+      /*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},
+        /*#__PURE__*/React.createElement("button",{onClick:()=>setActiveGroup(null),style:{width:32,height:32,borderRadius:10,background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.6)",fontSize:16,flexShrink:0}},"\u2190"),
+        /*#__PURE__*/React.createElement("div",{style:{flex:1}},
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:17,fontWeight:800,color:"var(--text)"}},g.name),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},viewLabel)
+        )
+      ),
+      /*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},
+        g.subs.map(sub=>{var isEd=editCode===sub.code;return/*#__PURE__*/React.createElement("div",{key:sub.code,style:{background:"rgba(0,0,0,.03)",border:"1px solid rgba(0,0,0,.06)",borderRadius:14,padding:"14px 16px",marginBottom:10}},
+          /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
+            /*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"var(--text2)"}},sub.name),
+            isEd?
+              /*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center"}},
+                /*#__PURE__*/React.createElement("input",{type:"number",value:editVal,onChange:e=>setEditVal(e.target.value),onKeyDown:e=>{if(e.key==="Enter")saveEdit(sub.code);if(e.key==="Escape")setEditCode(null);},autoFocus:true,style:{width:80,background:"rgba(0,0,0,.07)",border:"1.5px solid rgba(52,211,153,.4)",borderRadius:8,padding:"5px 8px",fontSize:13,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",textAlign:"right"}}),
+                /*#__PURE__*/React.createElement("span",{style:{fontSize:11,color:"var(--muted)"}},"\u20AC"),
+                /*#__PURE__*/React.createElement("button",{onClick:()=>saveEdit(sub.code),style:{background:"#10B981",border:"none",borderRadius:7,padding:"5px 10px",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}},"\u2713")
+              ):
+              /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                /*#__PURE__*/React.createElement("span",{style:{fontSize:14,fontWeight:800,fontFamily:"var(--font-mono)",color:sub.barColor}},sub.budget>0?sub.budget+"\u20AC":"—"),
+                /*#__PURE__*/React.createElement("button",{onClick:()=>{setEditCode(sub.code);setEditVal(sub.budget>0?String(sub.budget):"");},style:{background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",borderRadius:7,padding:"4px 9px",color:"var(--subtle)",fontSize:11,cursor:"pointer"}},"\u270E")
+              )
+          ),
+          /*#__PURE__*/React.createElement("div",{style:{height:5,background:"rgba(0,0,0,.06)",borderRadius:4,overflow:"hidden",marginBottom:5}},
+            /*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(sub.pct||0,100)}%`,background:sub.barColor,borderRadius:4,transition:"width .4s"}})
+          ),
+          /*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--subtle)",fontFamily:"var(--font-mono)"}},
+            /*#__PURE__*/React.createElement("span",null,"Real: ",sub.actual>0?Math.round(sub.actual)+"\u20AC":"0\u20AC",viewMode!=="mes"?" /mes":""),
+            sub.pct!==null&&/*#__PURE__*/React.createElement("span",{style:{color:sub.barColor}},sub.pct,"%")
+          )
+        );}),
+        /*#__PURE__*/React.createElement("div",{style:{textAlign:"center",padding:"12px 0 4px",fontSize:9,color:"var(--subtle)",fontFamily:"var(--font-mono)"}},"Toca \u270E per editar el l\xEDmit mensual")
+      ),
+      /*#__PURE__*/React.createElement(MobileBar,{screen:"budget",onHome:onHome,onMenu:onMenu})
+    );
+  }
+  // ── Vista resum ──
+  return/*#__PURE__*/React.createElement("div",{className:"m-screen"},
+    /*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 10px",display:"flex",alignItems:"center",gap:10}},
+      /*#__PURE__*/React.createElement(TabBadge,{id:"budget",size:36,active:true}),
+      /*#__PURE__*/React.createElement("div",null,
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Pressupost"),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},viewLabel)
+      )
+    ),
+    /*#__PURE__*/React.createElement("div",{style:{background:"linear-gradient(135deg,#0B1829,#0D2B45,#0A4060)",margin:"0 18px 12px",borderRadius:16,padding:"16px 18px",position:"relative",overflow:"hidden",boxShadow:"0 6px 24px rgba(10,64,96,.35)"}},
+      /*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,marginBottom:10,background:"rgba(255,255,255,.1)",padding:3,borderRadius:10}},
+        [["mes","Mes"],["rang","Rang"],["origen","Origen"]].map(([v,l])=>/*#__PURE__*/React.createElement("button",{key:v,onClick:()=>setViewMode(v),style:{flex:1,padding:"6px 0",borderRadius:8,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,transition:"all .15s",background:viewMode===v?"#10B981":"transparent",color:viewMode===v?"#fff":"rgba(255,255,255,.55)"}},l))
+      ),
+      viewMode==="mes"&&/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,marginBottom:10}},
+        /*#__PURE__*/React.createElement("select",{style:{...ss,flex:1},value:selMonth,onChange:e=>setSelMonth(parseInt(e.target.value))},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),
+        /*#__PURE__*/React.createElement("select",{style:ss,value:selYear,onChange:e=>setSelYear(parseInt(e.target.value))},allYears.map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y)))
+      ),
+      viewMode==="rang"&&/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10,alignItems:"center"}},
+        /*#__PURE__*/React.createElement("select",{style:ss,value:avgFromM,onChange:e=>setAvgFromM(parseInt(e.target.value))},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),
+        /*#__PURE__*/React.createElement("select",{style:ss,value:avgFrom,onChange:e=>setAvgFrom(parseInt(e.target.value))},allYears.map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y))),
+        /*#__PURE__*/React.createElement("span",{style:{color:"rgba(255,255,255,.4)",fontSize:11}},"→"),
+        /*#__PURE__*/React.createElement("select",{style:ss,value:avgToM,onChange:e=>setAvgToM(parseInt(e.target.value))},MONTHS_CA.map((m,i)=>/*#__PURE__*/React.createElement("option",{key:i,value:i+1},m))),
+        /*#__PURE__*/React.createElement("select",{style:ss,value:avgTo,onChange:e=>setAvgTo(parseInt(e.target.value))},allYears.map(y=>/*#__PURE__*/React.createElement("option",{key:y,value:y},y)))
+      ),
+      /*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:16,marginBottom:10}},
+        /*#__PURE__*/React.createElement("div",null,
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"rgba(255,255,255,.45)",textTransform:"uppercase",letterSpacing:".07em",marginBottom:3}},viewMode==="mes"?"Pressupost mensual":"Pressupost mig"),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:22,fontWeight:800,fontFamily:"var(--font-mono)",color:"#fff",lineHeight:1}},fmtK(totals.bI>0?totals.bI-totals.bD:totals.bD))
+        ),
+        /*#__PURE__*/React.createElement("div",null,
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"rgba(255,255,255,.45)",textTransform:"uppercase",letterSpacing:".07em",marginBottom:3}},viewMode==="mes"?"Real mes":"Mitj./mes"),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:22,fontWeight:800,fontFamily:"var(--font-mono)",color:totals.rI-totals.rD>=0?"#34D399":"#FCA5A5",lineHeight:1}},fmtK(Math.round(totals.rI-totals.rD)))
+        ),
+        /*#__PURE__*/React.createElement("div",null,
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"rgba(255,255,255,.45)",textTransform:"uppercase",letterSpacing:".07em",marginBottom:3}},"Resultat"),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:22,fontWeight:800,fontFamily:"var(--font-mono)",color:totals.resultat>=0?"#34D399":"#FCA5A5",lineHeight:1}},totals.resultat>=0?"+":"",fmtK(Math.round(totals.resultat)))
+        )
+      ),
+      totals.bD>0&&/*#__PURE__*/React.createElement(React.Fragment,null,
+        /*#__PURE__*/React.createElement("div",{style:{height:5,background:"rgba(255,255,255,.1)",borderRadius:3,overflow:"hidden",marginBottom:4}},
+          /*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(totalPct,100)}%`,background:totalPct>100?"#f87171":totalPct>80?"#fbbf24":"#10B981",borderRadius:3,transition:"width .6s"}})
+        ),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"rgba(255,255,255,.4)",fontFamily:"var(--font-mono)"}},totalPct,"% del pressupost · Despeses: ",fmtK(Math.round(totals.rD))," / ",fmtK(totals.bD))
+      )
+    ),
+    /*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},
+      /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--text2)",fontWeight:700,letterSpacing:".07em",textTransform:"uppercase",marginBottom:10}},"Per grups \u2014 toca per veure detall"),
+      groups.map((g,i)=>{var isExp=g.isExpanded;return/*#__PURE__*/React.createElement("div",{key:g.code},
+        /*#__PURE__*/React.createElement("div",{className:"fade-up card-surface",style:{animationDelay:`${i*.05}s`,background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"14px 16px",marginBottom:isExp?0:8,cursor:"pointer",transition:"background .15s"},onClick:()=>{if(g.subs.length>0)toggleGroup(g.code);else setActiveGroup(g.code);}},
+          /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
+            /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+              /*#__PURE__*/React.createElement("div",{style:{width:28,height:28,borderRadius:9,background:g.barColor+"22",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+                /*#__PURE__*/React.createElement("div",{style:{width:14,height:14,color:g.barColor}},TAB_SVG[GROUP_ICON_MAP[g.code]]||TAB_SVG.budget)
+              ),
+              /*#__PURE__*/React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--text)"}},g.code," · ",g.name)
+            ),
+            /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+              g.pct!==null&&/*#__PURE__*/React.createElement("span",{style:{fontSize:12,fontWeight:700,fontFamily:"var(--font-mono)",color:g.barColor}},g.pct,"%"),
+              /*#__PURE__*/React.createElement("span",{style:{fontSize:10,color:"var(--muted)",fontFamily:"var(--font-mono)"}},g.budget>0?`${Math.round(g.actual)}/${g.budget}\u20AC`:"sense l\xEDmit"),
+              g.subs.length>0&&/*#__PURE__*/React.createElement("span",{style:{fontSize:12,color:"var(--subtle)",transform:isExp?"rotate(90deg)":"none",display:"inline-block",transition:"transform .2s"}},"\u203A")
+            )
+          ),
+          g.pct!==null&&/*#__PURE__*/React.createElement("div",{style:{height:4,background:"rgba(255,255,255,.08)",borderRadius:3,overflow:"hidden",marginTop:8}},
+            /*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.min(g.pct,100)}%`,background:g.barColor,borderRadius:3,transition:"width .5s"}})
+          )
+        ),
+        isExp&&g.subs.length>0&&/*#__PURE__*/React.createElement("div",{style:{background:"rgba(0,0,0,.15)",borderRadius:"0 0 14px 14px",padding:"4px 14px 10px",marginBottom:8}},
+          g.subs.map(sub=>/*#__PURE__*/React.createElement("div",{key:sub.code,style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.05)"}},
+            /*#__PURE__*/React.createElement("div",null,
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"var(--text2)",fontWeight:500}},sub.name),
+              sub.budget>0&&/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--subtle)",fontFamily:"var(--font-mono)"}},Math.round(sub.actual),"\u20AC / ",sub.budget,"\u20AC")
+            ),
+            /*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+              sub.pct!==null&&/*#__PURE__*/React.createElement("span",{style:{fontSize:12,fontWeight:700,color:sub.barColor}},sub.pct,"%"),
+              /*#__PURE__*/React.createElement("button",{onClick:e=>{e.stopPropagation();setEditCode(sub.code);setEditVal(sub.budget>0?String(sub.budget):"");setActiveGroup(g.code);},style:{background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",borderRadius:7,padding:"3px 8px",color:"var(--subtle)",fontSize:11,cursor:"pointer"}},"\u270E")
+            )
+          ))
+        )
+      );}),
+      /*#__PURE__*/React.createElement("div",{style:{height:80}})
+    ),
+    /*#__PURE__*/React.createElement(MobileBar,{screen:"budget",onHome:onHome,onMenu:onMenu})
+  );
+}
+// ════════════════════════════════════════════════════════════════════════════
 // SECCIÓ: MOVIMENTS
 // ════════════════════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════════════════════
@@ -1103,19 +1253,9 @@ function StatsMobile({txns=[],budget={},catMap={},onHome,onMenu,onNavigate,panel
     if(onvanType==="ing_subgrup"){return Object.entries(sumByCat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([code,val])=>({name:catMap[code]?.name||code,value:val}));}
     var filtered=Object.entries(sumByCat);if(onvanGroup)filtered=filtered.filter(([c])=>catMap[c]?.group===onvanGroup);return filtered.sort((a,b)=>b[1]-a[1]).slice(0,8).map(([code,val])=>({name:catMap[code]?.name||code,value:val}));
   },[mt,catMap,onvanType,onvanGroup]);
-  // ── Progrés data ──
-  var yearBalances=useMemo(()=>allYears.map(y=>{var sl=txns.filter(t=>new Date(t.date).getFullYear()===y);var ing=sl.filter(t=>catMap[t.code]?.type==="INGRÉS").reduce((s,t)=>s+t.amount,0);var dep=sl.filter(t=>catMap[t.code]?.type==="DESPESA").reduce((s,t)=>s+t.amount,0);return{any:String(y),bal:Math.round(ing-dep)};}),[txns,allYears,catMap]);
-  var latestDate=txns.length>0?[...txns].sort((a,b)=>b.date.localeCompare(a.date))[0].date:null;var latestD=latestDate?new Date(latestDate):new Date();var latestY=latestD.getFullYear(),latestM=latestD.getMonth()+1;var prevM=latestM===1?12:latestM-1,prevY=latestM===1?latestY-1:latestY;
-  var curSlice=txns.filter(t=>{var d=new Date(t.date);return d.getFullYear()===latestY&&d.getMonth()+1===latestM;});
-  var prevSlice=txns.filter(t=>{var d=new Date(t.date);return d.getFullYear()===prevY&&d.getMonth()+1===prevM;});
-  var curDep=curSlice.filter(t=>catMap[t.code]?.type==="DESPESA").reduce((s,t)=>s+t.amount,0);
-  var prevDep=prevSlice.filter(t=>catMap[t.code]?.type==="DESPESA").reduce((s,t)=>s+t.amount,0);
-  var curIng=curSlice.filter(t=>catMap[t.code]?.type==="INGRÉS").reduce((s,t)=>s+t.amount,0);
-  var prevIng=prevSlice.filter(t=>catMap[t.code]?.type==="INGRÉS").reduce((s,t)=>s+t.amount,0);
-  // ── SVG Mini chart ──
   var maxEvolVal=Math.max(...evolData.map(d=>Math.abs(d.val)),1);
   var CHART_COLORS_LIST=["#10B981","#60a5fa","#fbbf24","#f87171","#a78bfa","#fb923c","#34d399","#818cf8"];
-  var TABS=["Evolució","On va el €","Progrés"];
+  var TABS=["Evolució","On va el €"];
   var ss={padding:"4px 7px",borderRadius:7,border:"1px solid rgba(0,0,0,.09)",fontSize:11,background:"var(--surface2)",color:"var(--text2)",cursor:"pointer",outline:"none"};
   var grpCodes=[...new Set(cats.filter(c=>c.level==="grup"&&c.type==="DESPESA").map(c=>c.code))];
   var subCatsAll=cats.filter(c=>c.level==="sub");
@@ -1155,15 +1295,6 @@ function StatsMobile({txns=[],budget={},catMap={},onHome,onMenu,onNavigate,panel
       onvanPie.length===0?/*#__PURE__*/React.createElement("div",{style:{textAlign:"center",padding:"40px 0",color:"var(--muted)",fontSize:13}},"Sense dades per al període."):
       /*#__PURE__*/React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14,padding:"14px 12px"}},
         /*#__PURE__*/React.createElement(SVGPieChart,{data:onvanPie,colors:CHART_COLORS,height:220,fmt:fmtK})
-      )
-    ),
-    tab===2&&/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},
-      /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:10}},MONTHS_CA[latestM-1]+" "+latestY," vs ",MONTHS_SHORT[prevM-1]," ",prevY),
-      [{label:"Despeses",cur:curDep,prev:prevDep,goodIfNeg:true},{label:"Ingressos",cur:curIng,prev:prevIng,goodIfNeg:false},{label:"Balanç",cur:curIng-curDep,prev:prevIng-prevDep,goodIfNeg:false}].map(row=>{var diff=row.prev>0?Math.round((row.cur/row.prev-1)*100):null;var good=row.goodIfNeg?diff<0:diff>0;var dc=diff===null?"var(--subtle)":good?"#10B981":"#f87171";return/*#__PURE__*/React.createElement("div",{key:row.label,style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14,padding:"14px",marginBottom:8}},/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}},row.label),/*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:20,fontWeight:800,fontFamily:"var(--font-mono)",color:row.label==="Balanç"?row.cur>=0?"#10B981":"#f87171":row.label==="Despeses"?"#f87171":"#10B981",lineHeight:1}},row.label==="Balanç"&&row.cur>=0?"+":" ",fmtK(row.cur)),/*#__PURE__*/React.createElement("div",{style:{textAlign:"right"}},diff!==null&&/*#__PURE__*/React.createElement("div",{style:{fontSize:15,fontWeight:800,color:dc}},diff>0?"+":"",diff,"%"),row.prev>0&&/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",marginTop:2}},"ant. ",fmtK(row.prev)))));}),
-      yearBalances.length>1&&/*#__PURE__*/React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:14,padding:"14px 12px",marginTop:10}},
-        /*#__PURE__*/React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"var(--text)",marginBottom:4}},"Balanç anual"),
-        /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--subtle)",marginBottom:10}},"Verd = superàvit · Vermell = dèficit"),
-        /*#__PURE__*/React.createElement(SVGBalanceChart,{data:yearBalances,height:150,fmt:fmtK})
       )
     ),
     /*#__PURE__*/React.createElement("div",{style:{height:80}}),
