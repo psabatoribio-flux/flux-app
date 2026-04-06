@@ -1324,7 +1324,9 @@ function PrediccioMobile({txns=[],budget={},catMap={},onHome,onMenu,onGoToBudget
     var varTot=avgExp6m-fixedTot;
     var actualNet=avgInc6m-avgExp6m-goalMonthly;
     var plannedNet=goals.length>0?goalMonthly>0?avgInc6m-fixedTot-varTot-goalMonthly:actualNet:actualNet;
-    var plannedSav=Math.max(0,avgInc6m-avgExp6m);
+    // plannedSav = estalvi pressupostat (budget), com fa la versió web
+    var budgI=0,budgD=0;Object.entries(budget).forEach(([code,amt])=>{if(!amt)return;if(catMap[code]?.type==="INGRÉS")budgI+=amt;else budgD+=amt;});
+    var plannedSav=budgI>0||budgD>0?Math.max(0,budgI-budgD):Math.max(0,avgInc6m-avgExp6m);
     var targetN=plannedSav;var targetA=plannedSav*1.2;var targetAl=plannedSav*0.8;
     var actualSav=avgInc6m-avgExp6m;
     var alegreOk=targetN>0&&actualSav>targetAl;
