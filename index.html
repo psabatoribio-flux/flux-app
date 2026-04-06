@@ -1204,23 +1204,213 @@ var handleEditSave=(txn,newCode)=>{var newName=catMap[newCode]?.name||newCode;va
 var matches=descKey?txns.filter(t=>t.id!==txn.id&&(t.description||"").toLowerCase().trim()===descKey):[];if(matches.length>0){setReassign({txn,newCode,newName,matches});}else{onReassign([txn.id],newCode);showToast(`✓ Reassignat a ${newName}`);}setEditTxn(null);};var handleReassignConfirm=ids=>{onReassign(ids,reassign.newCode);showToast(`✓ ${ids.length} moviment${ids.length!==1?"s":""} reassignats a ${reassign.newName}`);setReassign(null);};return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 12px",display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement(TabBadge,{id:"txns",size:36,active:true}),/*#__PURE__*/React.createElement("div",{style:{flex:1}},/*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Moviments"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},filtered.length," de ",txns.length," \xB7 ",df.label)),/*#__PURE__*/React.createElement("button",{onClick:()=>setSortDesc(v=>!v),style:{background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",borderRadius:9,padding:"6px 10px",color:"var(--text2)",fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",gap:4}},sortDesc?"↓ Recent":"↑ Antic")),/*#__PURE__*/React.createElement(DateFilterBar,df),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px 10px",position:"relative"}},/*#__PURE__*/React.createElement("div",{style:{position:"absolute",left:30,top:"50%",transform:"translateY(-50%)",color:"var(--muted)",fontSize:14,pointerEvents:"none"}},/*#__PURE__*/React.createElement("svg",{width:"14",height:"14",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2"},/*#__PURE__*/React.createElement("circle",{cx:"11",cy:"11",r:"8"}),/*#__PURE__*/React.createElement("path",{d:"m21 21-4.35-4.35"}))),/*#__PURE__*/React.createElement("input",{type:"text",placeholder:"Cerca per descripci\xF3 o categoria...",value:search,onChange:e=>setSearch(e.target.value),style:{width:"100%",background:"rgba(0,0,0,.04)",border:"1px solid rgba(0,0,0,.07)",borderRadius:12,padding:"10px 14px 10px 36px",fontSize:13,color:"var(--text)",fontFamily:"var(--font-sans)",outline:"none"}})),/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:7,padding:"0 18px 12px",overflowX:"auto"}},["","INGRÉS","DESPESA"].map(t=>{var ac=filterType===t;var gc=t==="DESPESA"?"rgba(248,113,113,":"rgba(52,211,153,";return/*#__PURE__*/React.createElement("button",{key:t||"all",onClick:()=>setFilterType(t),style:{flexShrink:0,padding:"5px 12px",borderRadius:20,border:"1px solid",fontSize:11,fontWeight:700,cursor:"pointer",transition:"all .2s",borderColor:ac?gc+".7)":"rgba(0,0,0,.07)",background:ac?gc+".12)":"transparent",color:ac?t==="DESPESA"?"#f87171":"#10B981":"var(--muted)",boxShadow:ac?`0 0 12px ${gc}.4)`:""}},t===""?"Tots":t==="INGRÉS"?"↑ Ingressos":"↓ Despeses");})),/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:8,padding:"0 18px 14px"}},/*#__PURE__*/React.createElement("div",{style:{flex:1,background:"rgba(52,211,153,.07)",border:"1px solid rgba(52,211,153,.15)",borderRadius:10,padding:"8px 12px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:3}},"Ingressos"),/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:"#10B981"}},fmtK(totalIn))),/*#__PURE__*/React.createElement("div",{style:{flex:1,background:"rgba(248,113,113,.07)",border:"1px solid rgba(248,113,113,.15)",borderRadius:10,padding:"8px 12px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:3}},"Despeses"),/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:"#f87171"}},fmtK(totalOut))),/*#__PURE__*/React.createElement("div",{style:{flex:1,background:"rgba(0,0,0,.03)",border:"1px solid rgba(0,0,0,.07)",borderRadius:10,padding:"8px 12px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:3}},"Balan\xE7"),/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:totalIn-totalOut>=0?"#10B981":"#f87171"}},fmtK(totalIn-totalOut)))),editTxn&&/*#__PURE__*/React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:999,display:"flex",alignItems:"flex-end"},onClick:()=>setEditTxn(null)},/*#__PURE__*/React.createElement("div",{style:{width:"100%",background:"var(--surface)",borderRadius:"20px 20px 0 0",padding:"24px 20px"},onClick:e=>e.stopPropagation()},/*#__PURE__*/React.createElement("div",{style:{fontSize:15,fontWeight:800,color:"var(--text)",marginBottom:4}},"Canviar categoria"),/*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"var(--muted)",marginBottom:16,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},editTxn.description||editTxn.code," \xB7 ",editTxn.date),/*#__PURE__*/React.createElement(CategoryPicker,{cats:allSubCats,value:editTxn.code,onChange:code=>{if(code&&code!==editTxn.code)handleEditSave(editTxn,code);else setEditTxn(null);},type:catMap[editTxn.code]?.type||"DESPESA",pal:TAB_PAL.txns}),/*#__PURE__*/React.createElement("button",{onClick:()=>setEditTxn(null),style:{width:"100%",marginTop:10,padding:"11px",background:"transparent",border:"1px solid var(--border)",borderRadius:12,fontSize:13,color:"var(--muted)",cursor:"pointer"}},"Cancel\xB7lar"))),reassign&&/*#__PURE__*/React.createElement(ReassignModal,{txn:reassign.txn,newCode:reassign.newCode,newName:reassign.newName,matches:reassign.matches,onConfirm:handleReassignConfirm,onCancel:()=>{onReassign([reassign.txn.id],reassign.newCode);showToast(`✓ Reassignat a ${reassign.newName}`);setReassign(null);}}),filtered.length===0?/*#__PURE__*/React.createElement("div",{style:{textAlign:"center",padding:"40px 24px",color:"var(--muted)",fontSize:13}},"Cap moviment amb aquest filtre."):/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},filtered.slice(page*20,(page+1)*20).map((t,i)=>{var cat=catMap[t.code];var isIng=cat?.type==="INGRÉS";var isDel=showDel===t.id;return/*#__PURE__*/React.createElement("div",{key:t.id,className:"fade-up",style:{animationDelay:`${Math.min(i*.03,.2)}s`,background:isDel?"rgba(248,113,113,.08)":"rgba(255,255,255,.03)",border:`1px solid ${isDel?"rgba(248,113,113,.25)":"rgba(0,0,0,.05)"}`,borderRadius:12,padding:"12px 14px",marginBottom:8,transition:"all .2s"}},/*#__PURE__*/React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement("div",{style:{width:32,height:32,borderRadius:10,background:isIng?"rgba(52,211,153,.1)":"rgba(8,145,178,.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},/*#__PURE__*/React.createElement("div",{style:{width:16,height:16,color:isIng?"#10B981":"#60a5fa",display:"flex",alignItems:"center",justifyContent:"center"}},isIng?TAB_SVG.stats:TAB_SVG.txns)),/*#__PURE__*/React.createElement("div",{style:{flex:1,minWidth:0},onClick:()=>setEditTxn(t)},/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"var(--text)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},t.description||cat?.name||t.code),/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",marginTop:1,display:"flex",alignItems:"center",gap:4}},t.date," \xB7",/*#__PURE__*/React.createElement("span",{style:{color:"var(--em)",fontWeight:600}},cat?.name||t.code))),/*#__PURE__*/React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}},/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:isIng?"#10B981":"#f87171"}},isIng?"+":"-",fmtK(t.amount)),!isDel?/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:4}},/*#__PURE__*/React.createElement("button",{onClick:()=>setEditTxn(t),style:{background:"rgba(99,102,241,.1)",border:"1px solid rgba(99,102,241,.2)",borderRadius:6,padding:"2px 7px",color:"#818cf8",fontSize:10,cursor:"pointer",fontWeight:600}},"\u270E"),/*#__PURE__*/React.createElement("button",{onClick:()=>setShowDel(t.id),style:{background:"transparent",border:"none",color:"var(--subtle)",fontSize:12,cursor:"pointer",padding:"2px 4px"}},"\u2715")):/*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:4}},/*#__PURE__*/React.createElement("button",{onClick:()=>{onDelete(t.id);setShowDel(null);showToast("Transacció eliminada");},style:{background:"#ef4444",border:"none",borderRadius:6,padding:"3px 8px",color:"#fff",fontSize:10,fontWeight:700,cursor:"pointer"}},"Eliminar"),/*#__PURE__*/React.createElement("button",{onClick:()=>setShowDel(null),style:{background:"rgba(0,0,0,.07)",border:"1px solid rgba(0,0,0,.09)",borderRadius:6,padding:"3px 7px",color:"var(--text2)",fontSize:10,cursor:"pointer"}},"No")))));})),filtered.length>20&&/*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"center",alignItems:"center",gap:12,padding:"12px 18px",borderTop:"1px solid var(--border)"}},/*#__PURE__*/React.createElement("button",{onClick:function(){setPage(function(p){return Math.max(0,p-1);});},disabled:page===0,style:{padding:"8px 16px",borderRadius:10,border:"1px solid var(--border)",background:page===0?"var(--surface2)":"var(--surface)",color:page===0?"var(--muted)":"var(--text)",fontWeight:700,fontSize:13,cursor:page===0?"default":"pointer"}},"← Ant."),/*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"var(--muted)"}},page*20+1,"-",Math.min((page+1)*20,filtered.length)," de ",filtered.length),/*#__PURE__*/React.createElement("button",{onClick:function(){setPage(function(p){return Math.min(Math.ceil(filtered.length/20)-1,p+1);});},disabled:(page+1)*20>=filtered.length,style:{padding:"8px 16px",borderRadius:10,border:"1px solid var(--border)",background:(page+1)*20>=filtered.length?"var(--surface2)":"var(--surface)",color:(page+1)*20>=filtered.length?"var(--muted)":"var(--text)",fontWeight:700,fontSize:13,cursor:(page+1)*20>=filtered.length?"default":"pointer"}},"Seg. →")),/*#__PURE__*/React.createElement(MobileBar,{screen:"txns",onHome:onHome,onMenu:onMenu}));}// ════════════════════════════════════════════════════════════════════════════
 // SECCIÓ: IMPORT CSV
 // ════════════════════════════════════════════════════════════════════════════
-function ImportCSVMobile({txns,rules={},pending=[],onImport,onAssignPending,onReassignTxns,onHome,onMenu,showToast,catMap={},cats=DEMO_CATS}){const[step,setStep]=useState(pending.length>0?"pending":"upload");const[dragging,setDragging]=useState(false);const[reassign,setReassign]=useState(null);const[rawRows,setRawRows]=useState([]);const[headers,setHeaders]=useState([]);const[colMap,setColMap]=useState({date:"",amount:"",desc:""});const[negSign,setNegSign]=useState("despesa");var fileRef=useRef(null);// Parseja import/data del csv de forma robusta (igual que al web)
-var parseAmount=s=>{if(!s)return 0;var v=s.trim().replace(/[^\d.,-]/g,"");if(!v||v==="-")return 0;var hC=v.includes(","),hD=v.includes(".");if(hC&&hD){v=v.lastIndexOf(",")>v.lastIndexOf(".")?v.replace(/\./g,"").replace(",","."):v.replace(/,/g,"");}else if(hC){var p=v.split(",");v=p.length===2&&p[1].length===3?v.replace(",",""):v.replace(",",".");}return parseFloat(v)||0;};var parseDate=s=>{if(!s)return"";var m1=s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);if(m1)return`${m1[3]}-${m1[2].padStart(2,"0")}-${m1[1].padStart(2,"0")}`;var m2=s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);if(m2)return`${m2[1]}-${m2[2].padStart(2,"0")}-${m2[3].padStart(2,"0")}`;return s;};var matchCat=desc=>{var d=(desc||"").toLowerCase();for(const[k,c]of Object.entries(rules)){if(d.includes(k))return c;}var h=[[/mercat|mercadona|lidl|aldi|carrefour|bonpreu|consum/i,"7.1"],[/farmac/i,"5.2"],[/gasolina|repsol|bp\b|cepsa/i,"3.6"],[/netflix|spotify|disney|hbo|amazon prime/i,"7.13"],[/hipotec/i,"1.1"],[/endesa|iberdrola|naturgy|electricitat/i,"1.4"],[/aigues|agua/i,"1.5"],[/internet|fibra|movistar|vodafone|orange/i,"1.6"],[/restaurant|bistro|bar\b|cafè|pizza/i,"7.3"],[/salari|nomina|nòmina/i,"9.1"]];for(const[r,c]of h){if(r.test(d))return c;}return null;};var handleFile=file=>{if(!file||!file.name.toLowerCase().endsWith(".csv")){showToast("Necessita un fitxer .csv","err");return;}var reader=new FileReader();reader.onload=e=>{var text=e.target.result;var lines=text.split(/\r?\n/).filter(l=>l.trim());if(lines.length<2){showToast("CSV buit o invàlid","err");return;}var sep=lines[0].includes(";")?";":",";var splitLine=line=>{var res=[];var cur="";var inQ=false;for(var c of line){if(c==='"'){inQ=!inQ;continue;}if(c===sep&&!inQ){res.push(cur.trim());cur="";}else cur+=c;}res.push(cur.trim());return res;};// Capçaleres: busca fila amb paraules clau
-var kwRe=/data|date|fecha|import|amount|importe|moviment|concepto|descripci|saldo/i;var hIdx=0;for(var i=0;i<Math.min(lines.length,8);i++){if(splitLine(lines[i]).length>=2&&lines[i].split(sep).some(p=>kwRe.test(p))){hIdx=i;break;}}var hdrs=splitLine(lines[hIdx]).map((h,i)=>h.replace(/"/g,"").trim()||`Col${i+1}`);var rows=lines.slice(hIdx+1).map(l=>{var p=splitLine(l);return Object.fromEntries(hdrs.map((h,i)=>[h,(p[i]||"").replace(/"/g,"").trim()]));}).filter(r=>Object.values(r).some(v=>v));// Auto-detect columnes
-var isNum=col=>rows.slice(0,8).filter(r=>r[col]&&/[\d]/.test(r[col])&&!/^\d{1,2}[\/\-\.]/.test(r[col])).length>=2;var hasNeg=col=>rows.slice(0,15).some(r=>(r[col]||"").includes("-"));var dateCol=hdrs[0];var amtCol=hdrs.find(h=>isNum(h)&&hasNeg(h))||hdrs[1];var descCol=hdrs.find(h=>h!==dateCol&&h!==amtCol&&!isNum(h))||hdrs[2];// Construeix pendents
-var newPending=[];var skipped=0,dupes=0;for(var row of rows){var rawAmt=parseAmount(row[amtCol]||"0");if(rawAmt===0){skipped++;continue;}var amt=Math.abs(rawAmt);var dateStr=parseDate(row[dateCol]||"");if(!dateStr){skipped++;continue;}var desc=row[descCol]||"";var isInc=rawAmt>0;// Dedup exacte
-var isDup=txns.some(t=>t.source==="csv"&&t.date===dateStr&&Math.abs(t.amount-amt)<0.01);if(isDup){dupes++;continue;}var code=matchCat(desc);if(code){// Auto-assignat
-newPending.push({id:Math.random().toString(36).slice(2),date:dateStr,amount:amt,description:desc,source:"csv",rawDescription:desc.toLowerCase().slice(0,40).trim(),csvIsIncome:isInc,code,autoAssigned:true});}else{newPending.push({id:Math.random().toString(36).slice(2),date:dateStr,amount:amt,description:desc,source:"csv",rawDescription:desc.toLowerCase().slice(0,40).trim(),csvIsIncome:isInc,code:null});}}var autoCount=newPending.filter(p=>p.autoAssigned).length;var manCount=newPending.filter(p=>!p.code).length;onImport(newPending);showToast(`✓ ${newPending.length} moviments · ${autoCount} auto · ${manCount} per classificar`);setRawRows(rows);setHeaders(hdrs);var autoDate=hdrs[0];var autoAmt=hdrs.find(h=>isNum(h)&&hasNeg(h))||hdrs[1];var autoDesc=hdrs.find(h=>h!==autoDate&&h!==autoAmt&&!isNum(h))||hdrs[2];setColMap({date:autoDate||"",amount:autoAmt||"",desc:autoDesc||""});setStep("config");};reader.readAsText(file,"UTF-8");};var processCSVFromConfig=()=>{if(!colMap.date||!colMap.amount){showToast("Selecciona data i import","err");return;}var newPending=[];for(var row of rawRows){var rawAmt=parseAmount(row[colMap.amount]||"0");if(rawAmt===0)continue;var amt=Math.abs(rawAmt);var dateStr=parseDate(row[colMap.date]||"");if(!dateStr)continue;var desc=row[colMap.desc]||"";var isInc=negSign==="ingrés"?rawAmt<0:rawAmt>0;if(txns.some(t=>t.source==="csv"&&t.date===dateStr&&Math.abs(t.amount-amt)<0.01))continue;var code=matchCat(desc);newPending.push({id:Math.random().toString(36).slice(2),date:dateStr,amount:amt,description:desc,source:"csv",rawDescription:desc.toLowerCase().slice(0,40).trim(),csvIsIncome:isInc,code:code||null,autoAssigned:!!code});}onImport(newPending);showToast("✓ "+newPending.length+" moviments importats");setStep("pending");};var subCats=cats.filter(c=>c.type);// ── Vista "Pendents per classificar" ──
-if(step==="pending"||pending.length>0){var unassigned=pending.filter(p=>!p.code);var assigned=pending.filter(p=>p.code);if(step==="config"){var ss={width:"100%",padding:"9px 12px",borderRadius:10,border:"1px solid var(--border)",background:"var(--surface2)",color:"var(--text)",fontSize:13,outline:"none"};return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 10px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Configura les columnes"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},"Assigna data, import i descripció")),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px",flex:1,overflowY:"auto"}},[["date","Data *"],["amount","Import (€) *"],["desc","Descripció"]].map(function(pair){var k=pair[0],lbl=pair[1];return/*#__PURE__*/React.createElement("div",{key:k,style:{marginBottom:10}},/*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}},lbl),/*#__PURE__*/React.createElement("select",{style:ss,value:colMap[k],onChange:function(ev){var v=ev.target.value;var next=Object.assign({},colMap);next[k]=v;setColMap(next);}},/*#__PURE__*/React.createElement("option",{value:""},"— Selecciona —"),headers.map(function(h){return/*#__PURE__*/React.createElement("option",{key:h,value:h},h);})));}),[["despesa","Negatiu = Despesa"],["ingrés","Negatiu = Ingrés"]].map(function(pair2){var v2=pair2[0],l2=pair2[1];return/*#__PURE__*/React.createElement("button",{key:v2,onClick:function(){setNegSign(v2);},style:{display:"block",width:"100%",padding:"9px",borderRadius:10,border:"1px solid",borderColor:negSign===v2?"#10B981":"var(--border)",background:negSign===v2?"rgba(16,185,129,.1)":"transparent",color:negSign===v2?"#10B981":"var(--text2)",fontWeight:700,fontSize:12,cursor:"pointer",marginBottom:6,textAlign:"left"}},l2);})),/*#__PURE__*/React.createElement("div",{style:{padding:"10px 18px 20px",display:"flex",gap:8}},/*#__PURE__*/React.createElement("button",{onClick:function(){setStep("upload");},style:{flex:1,padding:11,borderRadius:12,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text2)",fontWeight:700,fontSize:13,cursor:"pointer"}},"← Enrere"),/*#__PURE__*/React.createElement("button",{onClick:processCSVFromConfig,style:{flex:2,padding:11,borderRadius:12,border:"none",background:"#10B981",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer"}},"Processar →")),/*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu}));}return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement(TabBadge,{id:"import",size:36,active:true}),/*#__PURE__*/React.createElement("div",{style:{flex:1}},/*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Import CSV"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},unassigned.length," per classificar \xB7 ",assigned.length," llestos")),/*#__PURE__*/React.createElement("button",{onClick:()=>setStep("upload"),style:{background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",borderRadius:9,padding:"6px 11px",color:"var(--text2)",fontSize:11,cursor:"pointer"}},"+ Nou CSV")),pending.length>0&&/*#__PURE__*/React.createElement("div",{style:{margin:"0 18px 16px"}},/*#__PURE__*/React.createElement("div",{style:{height:6,background:"rgba(0,0,0,.06)",borderRadius:4,overflow:"hidden",marginBottom:5}},/*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.round(assigned.length/pending.length*100)}%`,background:"linear-gradient(90deg,#10B981,#10B981)",borderRadius:4,transition:"width .4s"}})),/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",fontFamily:"var(--font-mono)"}},Math.round(assigned.length/pending.length*100),"% classificat \xB7 ",unassigned.length," restants")),unassigned.length>0&&/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--amber)",fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:10}},"Per classificar"),unassigned.slice(0,10).map(p=>/*#__PURE__*/React.createElement("div",{key:p.id,style:{background:"rgba(251,191,36,.06)",border:"1px solid rgba(251,191,36,.18)",borderRadius:12,padding:"12px 14px",marginBottom:8}},/*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},/*#__PURE__*/React.createElement("div",{style:{flex:1,minWidth:0}},/*#__PURE__*/React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},p.description||"—"),/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",marginTop:2}},p.date)),/*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:p.csvIsIncome?"#10B981":"#f87171",flexShrink:0,marginLeft:8}},p.csvIsIncome?"+":"-",fmtK(p.amount))),/*#__PURE__*/React.createElement("div",{style:{marginTop:8}},/*#__PURE__*/React.createElement(CategoryPicker,{cats:cats,value:"",onChange:code=>{if(!code)return;var newName=catMap[code]?.name||code;var descKey=(p.description||"").toLowerCase().trim();// Cerca altres pendents amb la mateixa descripció
-var similarPending=descKey?pending.filter(x=>x.id!==p.id&&(x.description||"").toLowerCase().trim()===descKey):[];// Cerca txns ja importats amb la mateixa descripció i categoria diferent
-var similarTxns=descKey?txns.filter(t=>(t.description||"").toLowerCase().trim()===descKey&&t.code!==code):[];if(similarPending.length>0||similarTxns.length>0){setReassign({txn:p,newCode:code,newName,// Mostrem pendents + txns existents com a "matches"
-matches:[...similarPending.map(x=>({...x,_isPending:true})),...similarTxns]});}else{onAssignPending(p.id,code);}},type:p.csvIsIncome?"INGRÉS":"DESPESA",pal:TAB_PAL.import}),/*#__PURE__*/React.createElement("button",{onClick:()=>onAssignPending(p.id,"__SKIP__"),style:{width:"100%",marginTop:6,background:"transparent",border:"1px solid rgba(0,0,0,.08)",borderRadius:8,padding:"6px 10px",color:"var(--subtle)",fontSize:11,cursor:"pointer"}},"\u2298 Ignorar aquest moviment")))),unassigned.length>10&&/*#__PURE__*/React.createElement("div",{style:{textAlign:"center",padding:"8px 0",fontSize:11,color:"var(--muted)"}},"+",unassigned.length-10," pendents m\xE9s...")),assigned.length>0&&/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px",marginTop:8}},/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"#10B981",fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:10}},"Llestos per importar"),assigned.slice(0,5).map(p=>{var cat=catMap[p.code]||subCats.find(c=>c.code===p.code);return/*#__PURE__*/React.createElement("div",{key:p.id,style:{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid rgba(0,0,0,.03)"}},/*#__PURE__*/React.createElement("div",{style:{flex:1,minWidth:0}},/*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,.6)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},p.description||"—"),/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)"}},cat?.name||p.code)),/*#__PURE__*/React.createElement("div",{style:{fontSize:12,fontWeight:700,fontFamily:"var(--font-mono)",color:p.csvIsIncome?"#10B981":"#f87171",flexShrink:0}},p.csvIsIncome?"+":"-",fmtK(p.amount)));}),assigned.length>5&&/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--subtle)",padding:"6px 0"}},"+",assigned.length-5," m\xE9s...")),assigned.length>0&&/*#__PURE__*/React.createElement("div",{style:{padding:"16px 18px"}},/*#__PURE__*/React.createElement("button",{onClick:()=>{showToast(`✓ ${assigned.length} moviments importats`);onImport([]);},style:{width:"100%",padding:"14px",borderRadius:12,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#10B981,#059669)",color:"#fff",fontSize:14,fontWeight:800,boxShadow:"0 4px 16px rgba(16,185,129,.35)"}},"Confirmar ",assigned.length," moviments \u2192")),reassign&&/*#__PURE__*/React.createElement(ReassignModal,{txn:reassign.txn,newCode:reassign.newCode,newName:reassign.newName,matches:reassign.matches.filter(m=>m._isPending),onConfirm:ids=>{// Assigna el pendent principal
-onAssignPending(reassign.txn.id,reassign.newCode);// Assigna els altres pendents seleccionats
-ids.filter(id=>id!==reassign.txn.id).forEach(id=>{if(reassign.matches.find(m=>m.id===id&&m._isPending)){onAssignPending(id,reassign.newCode);}});// Reassigna txns ja importats si n'hi havia
-var txnIds=ids.filter(id=>reassign.matches.find(m=>m.id===id&&!m._isPending));if(txnIds.length>0&&onReassignTxns)onReassignTxns(txnIds,reassign.newCode);showToast(`✓ ${ids.length} moviments assignats a ${reassign.newName}`);setReassign(null);},onCancel:()=>{onAssignPending(reassign.txn.id,reassign.newCode);setReassign(null);}}),/*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu}));}// ── Vista "Puja CSV" ──
-return/*#__PURE__*/React.createElement("div",{className:"m-screen"},/*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},/*#__PURE__*/React.createElement(TabBadge,{id:"import",size:36,active:true}),/*#__PURE__*/React.createElement("div",null,/*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Import CSV"),/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},"Carrega l'extracte del teu banc"))),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px",marginBottom:18}},/*#__PURE__*/React.createElement("div",{onDragOver:e=>{e.preventDefault();setDragging(true);},onDragLeave:()=>setDragging(false),onDrop:e=>{e.preventDefault();setDragging(false);handleFile(e.dataTransfer.files[0]);},onClick:()=>fileRef.current?.click(),style:{border:`2px dashed ${dragging?"#10B981":"rgba(0,0,0,.10)"}`,borderRadius:16,padding:"40px 24px",textAlign:"center",cursor:"pointer",background:dragging?"rgba(52,211,153,.06)":"rgba(255,255,255,.02)",transition:"all .2s"}},/*#__PURE__*/React.createElement("div",{style:{marginBottom:12,display:"flex",justifyContent:"center"}},/*#__PURE__*/React.createElement(TabBadge,{id:"import",size:48,active:dragging})),/*#__PURE__*/React.createElement("div",{style:{fontSize:15,fontWeight:700,color:"var(--text2)",marginBottom:6}},dragging?"Deixa anar aquí":"Toca per seleccionar CSV"),/*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"var(--muted)",lineHeight:1.6}},"O arrossega el fitxer des del gestor de fitxers"),/*#__PURE__*/React.createElement("input",{ref:fileRef,type:"file",accept:".csv",style:{display:"none"},onChange:e=>handleFile(e.target.files[0])}))),/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:10}},"Bancs compatibles"),/*#__PURE__*/React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:7}},["CaixaBank","Sabadell","BBVA","Santander","ING","Openbank","Bankinter"].map(b=>/*#__PURE__*/React.createElement("div",{key:b,style:{background:"rgba(0,0,0,.04)",border:"1px solid rgba(0,0,0,.08)",borderRadius:8,padding:"5px 10px",fontSize:11,color:"var(--muted)"}},b)))),/*#__PURE__*/React.createElement("div",{style:{margin:"18px 18px 0",background:"rgba(52,211,153,.06)",border:"1px solid rgba(52,211,153,.14)",borderRadius:12,padding:"12px 14px"}},/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--text2)",lineHeight:1.65}},/*#__PURE__*/React.createElement("strong",{style:{color:"var(--em)"}},"Com descarregar el CSV:")," accedeix a la banca online \u2192 Moviments \u2192 Exportar \u2192 Format CSV. Cada banc pot tenir un nom diferent.")),/*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu}));}// ════════════════════════════════════════════════════════════════════════════
-// SECCIÓ: ESTADÍSTIQUES
-// ════════════════════════════════════════════════════════════════════════════
+function ImportCSVMobile({txns,rules={},pending=[],onImport,onAssignPending,onReassignTxns,onHome,onMenu,showToast,catMap={},cats=DEMO_CATS}){
+  const[step,setStep]=useState(pending.length>0?"pending":"upload");
+  const[rawRows,setRawRows]=useState([]);
+  const[headers,setHeaders]=useState([]);
+  const[colMap,setColMap]=useState({date:"",amount:"",desc:""});
+  const[negSign,setNegSign]=useState("despesa");
+  const[reassign,setReassign]=useState(null);
+  var fileRef=useRef(null);
+  // ── Parseja CSV i va a config (sense importar) ──
+  var handleFile=file=>{
+    if(!file||!file.name.toLowerCase().endsWith(".csv")){showToast("Necessita un fitxer .csv","err");return;}
+    var reader=new FileReader();
+    reader.onload=e=>{
+      var text=e.target.result;
+      var lines=text.split(/\r?\n/).filter(l=>l.trim());
+      if(lines.length<2){showToast("CSV buit o invàlid","err");return;}
+      var sep=lines[0].includes(";")?";":",";
+      var splitLine=line=>{var res=[];var cur="";var inQ=false;for(var ch of line){if(ch==='"'){inQ=!inQ;continue;}if(ch===sep&&!inQ){res.push(cur.trim());cur="";}else cur+=ch;}res.push(cur.trim());return res;};
+      var kwRe=/data|date|fecha|import|amount|importe|moviment|concepto|descripci|saldo/i;
+      var hIdx=0;for(var i=0;i<Math.min(lines.length,8);i++){if(splitLine(lines[i]).length>=2&&lines[i].split(sep).some(p=>kwRe.test(p))){hIdx=i;break;}}
+      var hdrs=splitLine(lines[hIdx]).map((h,i)=>h.replace(/"/g,"").trim()||`Col${i+1}`);
+      var rows=lines.slice(hIdx+1).map(l=>{var p=splitLine(l);return Object.fromEntries(hdrs.map((h,i)=>[h,(p[i]||"").replace(/"/g,"").trim()]));}).filter(r=>Object.values(r).some(v=>v));
+      // Auto-detect columnes
+      var isNum=col=>rows.slice(0,8).filter(r=>r[col]&&/[\d]/.test(r[col])&&!/^\d{1,2}[\/\-\.]/.test(r[col])).length>=2;
+      var hasNeg=col=>rows.slice(0,15).some(r=>(r[col]||"").includes("-"));
+      var dateCol=hdrs[0];var amtCol=hdrs.find(h=>isNum(h)&&hasNeg(h))||hdrs[1];var descCol=hdrs.find(h=>h!==dateCol&&h!==amtCol&&!isNum(h))||hdrs[2];
+      setHeaders(hdrs);setRawRows(rows);
+      setColMap({date:dateCol||"",amount:amtCol||"",desc:descCol||""});
+      setStep("config");
+    };
+    reader.readAsText(file,"UTF-8");
+  };
+  // ── Importació real (des de la pantalla de config) ──
+  var processCSVFromConfig=()=>{
+    if(!colMap.date||!colMap.amount){showToast("Selecciona data i import","err");return;}
+    var newPending=[];
+    for(var row of rawRows){
+      var rawAmt=parseAmount(row[colMap.amount]||"0");
+      if(rawAmt===0)continue;
+      var amt=Math.abs(rawAmt);
+      var dateStr=parseDate(row[colMap.date]||"");
+      if(!dateStr)continue;
+      var desc=row[colMap.desc]||"";
+      var isInc=negSign==="ingrés"?rawAmt<0:rawAmt>0;
+      if(txns.some(t=>t.source==="csv"&&t.date===dateStr&&Math.abs(t.amount-amt)<0.01))continue;
+      var code=matchCat(desc);
+      newPending.push({id:Math.random().toString(36).slice(2),date:dateStr,amount:amt,description:desc,source:"csv",rawDescription:desc.toLowerCase().slice(0,40).trim(),csvIsIncome:isInc,code:code||null,autoAssigned:!!code});
+    }
+    onImport(newPending);
+    showToast("✓ "+newPending.length+" moviments importats");
+    setStep("pending");
+  };
+  var allSubCats=cats.filter(c=>c.level==="sub");
+  var ss={width:"100%",padding:"9px 12px",borderRadius:10,border:"1px solid var(--border)",background:"var(--surface2)",color:"var(--text)",fontSize:13,outline:"none"};
+  // ── PANTALLA CONFIG ──
+  if(step==="config"){
+    // Preview: 3 files de mostra
+    var preview=rawRows.slice(0,3);
+    return/*#__PURE__*/React.createElement("div",{className:"m-screen"},
+      /*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 10px",display:"flex",alignItems:"center",gap:10}},
+        /*#__PURE__*/React.createElement("button",{onClick:()=>setStep("upload"),style:{width:32,height:32,borderRadius:10,background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"var(--text2)",fontSize:16,flexShrink:0}},"←"),
+        /*#__PURE__*/React.createElement("div",null,
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Configura les columnes"),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},rawRows.length+" files detectades · "+headers.length+" columnes")
+        )
+      ),
+      /*#__PURE__*/React.createElement("div",{style:{padding:"0 18px",flex:1,overflowY:"auto"}},
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}},"Columnes del CSV"),
+        /*#__PURE__*/React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}},
+          headers.map((h,i)=>{
+            var letter=String.fromCharCode(65+i);
+            var isDate=colMap.date===h,isAmt=colMap.amount===h,isDesc=colMap.desc===h;
+            var active=isDate||isAmt||isDesc;
+            var role=isDate?"DATA":isAmt?"IMPORT":isDesc?"DESC":null;
+            return/*#__PURE__*/React.createElement("div",{key:i,style:{padding:"4px 8px",borderRadius:6,background:active?"rgba(16,185,129,.12)":"rgba(0,0,0,.04)",border:"1px solid "+(active?"rgba(16,185,129,.3)":"rgba(0,0,0,.07)"),textAlign:"center",minWidth:44}},
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:9,fontWeight:700,color:"var(--subtle)"}},letter),
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:600,color:active?"#10B981":"var(--text2)",maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},h),
+              role&&/*#__PURE__*/React.createElement("div",{style:{fontSize:8,color:"#10B981",fontWeight:700}},role),
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:9,color:"var(--subtle)",marginTop:1}},rawRows[0]?.[h]?.slice(0,6)||"—")
+            );
+          })
+        ),
+        [["date","📅 Data *"],["amount","💶 Import (€) *"],["desc","📝 Descripció"]].map(([k,lbl])=>
+          /*#__PURE__*/React.createElement("div",{key:k,style:{marginBottom:10}},
+            /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:4}},lbl),
+            /*#__PURE__*/React.createElement("select",{style:ss,value:colMap[k],onChange:ev=>{var v=ev.target.value;setColMap(m=>({...m,[k]:v}));}},
+              /*#__PURE__*/React.createElement("option",{value:""},"— Selecciona —"),
+              headers.map((h,i)=>/*#__PURE__*/React.createElement("option",{key:h,value:h},String.fromCharCode(65+i)+": "+h))
+            ),
+            k==="amount"&&colMap.amount&&(()=>{
+              var samp=rawRows.slice(0,5).map(r=>r[colMap.amount]).filter(Boolean);
+              var ex=samp.find(v=>/\d/.test(v));
+              return ex&&/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"#10B981",marginTop:3}},"✓ Exemple: "+ex);
+            })(),
+            k==="date"&&colMap.date&&(()=>{
+              var ex=rawRows.slice(0,5).map(r=>r[colMap.date]).find(Boolean);
+              var parsed=ex?parseDate(ex):null;
+              return ex&&/*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:parsed?"#10B981":"#f59e0b",marginTop:3}},parsed?"✓ "+ex+" → "+parsed:"⚠ Format: "+ex);
+            })()
+          )
+        ),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8,marginTop:4}},"Convenció de signes"),
+        [["despesa","− = Despesa   + = Ingrés","Compte corrent habitual"],["ingrés","− = Ingrés   + = Despesa","Targeta de crèdit / alguns bancs"]].map(([v,label,hint])=>
+          /*#__PURE__*/React.createElement("button",{key:v,onClick:()=>setNegSign(v),style:{display:"block",width:"100%",padding:"10px 14px",borderRadius:10,border:"1px solid",borderColor:negSign===v?"#10B981":"rgba(0,0,0,.08)",background:negSign===v?"rgba(16,185,129,.10)":"transparent",color:negSign===v?"#10B981":"var(--text2)",fontWeight:700,fontSize:12,cursor:"pointer",marginBottom:6,textAlign:"left"}},
+            /*#__PURE__*/React.createElement("div",null,label),
+            /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:400,color:negSign===v?"rgba(16,185,129,.7)":"var(--subtle)",marginTop:2}},hint)
+          )
+        ),
+        preview.length>0&&/*#__PURE__*/React.createElement("div",{style:{marginTop:10,marginBottom:6}},
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:10,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}},"Previsualització (3 files)"),
+          preview.map((row,i)=>{
+            var d=row[colMap.date]||"—",a=row[colMap.amount]||"—",desc=row[colMap.desc]||"—";
+            var rawA=parseAmount(a);var isInc=negSign==="ingrés"?rawA<0:rawA>0;
+            return/*#__PURE__*/React.createElement("div",{key:i,style:{background:"rgba(0,0,0,.04)",borderRadius:8,padding:"8px 10px",marginBottom:6,fontSize:11,display:"flex",gap:8,alignItems:"center"}},
+              /*#__PURE__*/React.createElement("span",{style:{color:"var(--subtle)",minWidth:60,fontFamily:"var(--font-mono)"}},d),
+              /*#__PURE__*/React.createElement("span",{style:{color:isInc?"#10B981":"#f87171",fontWeight:700,fontFamily:"var(--font-mono)",minWidth:55}},a),
+              /*#__PURE__*/React.createElement("span",{style:{color:"var(--text2)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}},desc)
+            );
+          })
+        )
+      ),
+      /*#__PURE__*/React.createElement("div",{style:{padding:"10px 18px 20px",display:"flex",gap:8}},
+        /*#__PURE__*/React.createElement("button",{onClick:()=>setStep("upload"),style:{flex:1,padding:11,borderRadius:12,border:"1px solid var(--border)",background:"var(--surface)",color:"var(--text2)",fontWeight:700,fontSize:13,cursor:"pointer"}},"← Enrere"),
+        /*#__PURE__*/React.createElement("button",{onClick:processCSVFromConfig,style:{flex:2,padding:11,borderRadius:12,border:"none",background:"#10B981",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer"}},"Importar "+rawRows.length+" files →")
+      ),
+      /*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu})
+    );
+  }
+  // ── PANTALLA PENDENTS / CLASSIFICACIÓ ──
+  if(step==="pending"||pending.length>0){
+    var unassigned=pending.filter(p=>!p.code);
+    var assigned=pending.filter(p=>p.code);
+    return/*#__PURE__*/React.createElement("div",{className:"m-screen"},
+      /*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},
+        /*#__PURE__*/React.createElement(TabBadge,{id:"import",size:36,active:true}),
+        /*#__PURE__*/React.createElement("div",{style:{flex:1}},
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Import CSV"),
+          /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},unassigned.length+" per classificar · "+assigned.length+" llestos")
+        ),
+        /*#__PURE__*/React.createElement("button",{onClick:()=>setStep("upload"),style:{background:"rgba(0,0,0,.05)",border:"1px solid rgba(0,0,0,.08)",borderRadius:9,padding:"6px 11px",color:"var(--text2)",fontSize:11,cursor:"pointer"}},"+ Nou CSV")
+      ),
+      pending.length>0&&/*#__PURE__*/React.createElement("div",{style:{margin:"0 18px 12px"}},
+        /*#__PURE__*/React.createElement("div",{style:{height:5,background:"rgba(0,0,0,.06)",borderRadius:4,overflow:"hidden",marginBottom:4}},
+          /*#__PURE__*/React.createElement("div",{style:{height:"100%",width:`${Math.round(assigned.length/pending.length*100)}%`,background:"#10B981",borderRadius:4,transition:"width .4s"}})
+        ),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",fontFamily:"var(--font-mono)"}},Math.round(assigned.length/pending.length*100),"% classificat · ",unassigned.length," restants")
+      ),
+      unassigned.length>0&&/*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--amber)",fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",marginBottom:10}},"Per classificar"),
+        unassigned.slice(0,10).map(p=>/*#__PURE__*/React.createElement("div",{key:p.id,style:{background:"rgba(251,191,36,.06)",border:"1px solid rgba(251,191,36,.18)",borderRadius:12,padding:"12px 14px",marginBottom:8}},
+          /*#__PURE__*/React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
+            /*#__PURE__*/React.createElement("div",{style:{flex:1,minWidth:0}},
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},p.description||"—"),
+              /*#__PURE__*/React.createElement("div",{style:{fontSize:10,color:"var(--muted)",marginTop:2}},p.date)
+            ),
+            /*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:800,fontFamily:"var(--font-mono)",color:p.csvIsIncome?"#10B981":"#f87171",flexShrink:0,marginLeft:8}},p.csvIsIncome?"+":"-",fmtK(p.amount))
+          ),
+          /*#__PURE__*/React.createElement("div",{style:{marginTop:8}},
+            /*#__PURE__*/React.createElement(CategoryPicker,{cats:cats,value:"",onChange:code=>{
+              if(!code)return;
+              var newName=catMap[code]?.name||code;
+              var descKey=(p.description||"").toLowerCase().trim();
+              var matches=descKey?pending.filter(x=>x.id!==p.id&&(x.description||"").toLowerCase().trim()===descKey):[];
+              if(matches.length>0){setReassign({txn:p,newCode:code,newName,matches});}
+              else{onAssignPending(p.id,code);showToast("✓ Assignat a "+newName);}
+            },type:p.csvIsIncome?"INGRÉS":"DESPESA",pal:TAB_PAL.import})
+          )
+        ))
+      ),
+      reassign&&/*#__PURE__*/React.createElement(ReassignModal,{txn:reassign.txn,newCode:reassign.newCode,newName:reassign.newName,matches:reassign.matches,onConfirm:ids=>{ids.forEach(id=>{if(id===reassign.txn.id)onAssignPending(id,reassign.newCode);else onAssignPending(id,reassign.newCode);});showToast("✓ "+ids.length+" assignats");setReassign(null);},onCancel:()=>{onAssignPending(reassign.txn.id,reassign.newCode);showToast("✓ Assignat a "+reassign.newName);setReassign(null);}}),
+      /*#__PURE__*/React.createElement("div",{style:{height:80}}),
+      /*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu})
+    );
+  }
+  // ── PANTALLA UPLOAD ──
+  return/*#__PURE__*/React.createElement("div",{className:"m-screen"},
+    /*#__PURE__*/React.createElement("div",{style:{padding:"52px 18px 14px",display:"flex",alignItems:"center",gap:10}},
+      /*#__PURE__*/React.createElement(TabBadge,{id:"import",size:36,active:true}),
+      /*#__PURE__*/React.createElement("div",null,
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"var(--text)"}},"Import CSV"),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},"Importa els moviments del banc")
+      )
+    ),
+    /*#__PURE__*/React.createElement("div",{style:{padding:"0 18px"}},
+      /*#__PURE__*/React.createElement("div",{style:{background:"rgba(16,185,129,.06)",border:"1px solid rgba(16,185,129,.15)",borderRadius:14,padding:"16px 18px",marginBottom:16}},
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"var(--text)",marginBottom:6}},"📋 Com obtenir el CSV"),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:12,color:"var(--text2)",lineHeight:1.7}},
+          "1. Accedeix a la banca online",/*#__PURE__*/React.createElement("br",null),
+          "2. Moviments → Exportar → CSV",/*#__PURE__*/React.createElement("br",null),
+          "3. Selecciona el fitxer aquí baix"
+        )
+      ),
+      /*#__PURE__*/React.createElement("label",{style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:"32px 20px",background:"rgba(0,0,0,.03)",border:"2px dashed rgba(0,0,0,.12)",borderRadius:16,cursor:"pointer",marginBottom:16}},
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:36}},"📂"),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"var(--text)"}},"Selecciona el fitxer CSV"),
+        /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--muted)"}},"Sabadell, CaixaBank, BBVA, Santander..."),
+        /*#__PURE__*/React.createElement("input",{ref:fileRef,type:"file",accept:".csv,.txt",style:{display:"none"},onChange:e=>e.target.files[0]&&handleFile(e.target.files[0])})
+      ),
+      /*#__PURE__*/React.createElement("div",{style:{fontSize:11,color:"var(--subtle)",textAlign:"center",lineHeight:1.6}},
+        "Podràs configurar les columnes i el signe abans d'importar"
+      )
+    ),
+    /*#__PURE__*/React.createElement("div",{style:{height:80}}),
+    /*#__PURE__*/React.createElement(MobileBar,{screen:"import",onHome:onHome,onMenu:onMenu})
+  );
+}
+
 function StatsMobile({txns=[],budget={},catMap={},onHome,onMenu,onNavigate,panel=null}){
   const[tab,setTab]=useState(0);
   var df=useDateFilter(txns);var mt=df.filtered;
@@ -1331,12 +1521,10 @@ function PrediccioMobile({txns=[],budget={},catMap={},onHome,onMenu,onGoToBudget
     var actualSav=avgInc6m-avgExp6m;
     var alegreOk=targetN>0&&actualSav>targetAl;
     var gapN=Math.max(0,targetN-actualSav);var gapA=Math.max(0,targetA-actualSav);
-    var mkScenario=(label,color,desc,expMult)=>{var e=avgExp6m*expMult;var net=avgInc6m-e-goalMonthly;return{label,color,desc,monthlyNet:net,data:[3,6,12].map(mo=>({months:mo,label:mo===12?"12 mesos":mo+"m",balance:Math.round(net*mo),totalInc:Math.round(avgInc6m*mo),totalExp:Math.round(e*mo)}))};};
-    var expNorm=avgInc6m-targetN;var redN=expNorm>0&&avgExp6m>0?1-(expNorm/avgExp6m):0;
-    var expAust=avgInc6m-targetA;var redA=expAust>0&&avgExp6m>0?1-(expAust/avgExp6m):0;
+    var mkScenario=(label,color,desc,monthlyTarget)=>{var net=monthlyTarget-goalMonthly;return{label,color,desc,monthlyNet:net,data:[3,6,12].map(mo=>({months:mo,label:mo===12?"12 mesos":mo+"m",balance:Math.round(monthlyTarget*mo),totalInc:Math.round(avgInc6m*mo),totalExp:Math.round((avgInc6m-monthlyTarget)*mo)}))};};
     var results={
-      actual:mkScenario("Actual","#64748b","Situació actual sense canvis.",1),
-      normal:mkScenario("Normal","#3b82f6",`Assolir ${targetN.toFixed(0)}€/mes d'estalvi retallant despeses variables.`,1-Math.max(0,redN)*0.8),
+      actual:mkScenario("Actual","#64748b","Situació actual sense canvis.",actualSav),
+      normal:mkScenario("Normal","#3b82f6",`Assolir ${targetN.toFixed(0)}€/mes d'estalvi retallant despeses variables.`,targetN),
       auster:mkScenario("Auster","#10B981",`Estalvi màxim (${targetA.toFixed(0)}€/mes). Retallada severa de despeses.`,1-Math.max(0,redA)*0.8),
     };
     if(alegreOk)results.alegre=mkScenario("Alegre","#f59e0b",`Pots gastar una mica més i mantenir el ${(targetAl).toFixed(0)}€/mes d'objectiu mínim.`,1+0.05);
