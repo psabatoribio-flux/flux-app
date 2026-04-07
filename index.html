@@ -1525,9 +1525,9 @@ function PrediccioMobile({txns=[],budget={},catMap={},onHome,onMenu,onGoToBudget
     var results={
       actual:mkScenario("Actual","#64748b","Situació actual sense canvis.",actualSav),
       normal:mkScenario("Normal","#3b82f6",`Assolir ${targetN.toFixed(0)}€/mes d'estalvi retallant despeses variables.`,targetN),
-      auster:mkScenario("Auster","#10B981",`Estalvi màxim (${targetA.toFixed(0)}€/mes). Retallada severa de despeses.`,1-Math.max(0,redA)*0.8),
+      auster:mkScenario("Auster","#10B981",`Estalvi màxim (${targetA.toFixed(0)}€/mes). Retallada severa de despeses.`,targetA),
     };
-    if(alegreOk)results.alegre=mkScenario("Alegre","#f59e0b",`Pots gastar una mica més i mantenir el ${(targetAl).toFixed(0)}€/mes d'objectiu mínim.`,1+0.05);
+    if(alegreOk)results.alegre=mkScenario("Alegre","#f59e0b",`Pots gastar una mica més i mantenir el ${(targetAl).toFixed(0)}€/mes d'objectiu mínim.`,targetAl);
     var cuts=Object.entries(catAvg).filter(([c])=>isVar(c)&&budget[c]>0&&catAvg[c]>budget[c]).map(([c,real])=>({name:catMap[c]?.name||c,cut:real-budget[c],pct:Math.round((real/budget[c]-1)*100),suggestion:`Real: ${real.toFixed(0)}€ · Pressupost: ${budget[c]}€`})).sort((a,b)=>b.cut-a.cut).slice(0,5);
     return{results,cuts,gapToNormal:gapN,gapToAuster:gapA,alegreActivable:alegreOk,actualMonthlySavings:actualSav,plannedMonthlySavings:plannedSav,goalMonthly};
   },[kpisP,goals,budget,catMap]);
